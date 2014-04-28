@@ -1,0 +1,38 @@
+# NOTE! Don't add files that are generated in specific
+# subdirectories here. Add them in the ".gitignore" file
+# in that subdirectory instead.
+#
+# Normal rules
+#
+
+*.rej
+*.orig
+*.a
+*.o
+*.su
+*~
+*.swp
+*.patch
+*.bin
+
+#
+# Generated files
+#
+
+/build/CMakeCache.txt
+/build/CMakeFiles
+/build/cmake_install.cmake
+/build/Makefile
+/CMakeCache.txt
+/CMakeFiles
+/cmake_install.cmake
+/Makefile
+/bin
+
+# stgit generated dirs
+patches-*
+.stgit-edit.txt
+
+# quilt's files
+patches
+series
