@@ -1,0 +1,21 @@
+# LIBUCLIENT_FOUND - true if library and headers were found
+# LIBUCLIENT_INCLUDE_DIRS - include directories
+# LIBUCLIENT_LIBRARIES - library directories
+
+find_package(PkgConfig)
+pkg_check_modules(PC_LIBUCLIENT QUIET libuclient)
+
+find_path(LIBUCLIENT_INCLUDE_DIR libubox/uclient.h
+	HINTS ${PC_LIBUCLIENT_INCLUDEDIR} ${PC_LIBUCLIENT_INCLUDE_DIRS} PATH_SUFFIXES libuclient)
+
+find_library(LIBUCLIENT_LIBRARY NAMES uclient libuclient
+	HINTS ${PC_LIBUCLIENT_LIBDIR} ${PC_LIBUCLIENT_LIBRARY_DIRS})
+
+set(LIBUCLIENT_LIBRARIES ${LIBUCLIENT_LIBRARY})
+set(LIBUCLIENT_INCLUDE_DIRS ${LIBUCLIENT_INCLUDE_DIR})
+
+include(FindPackageHandleStandardArgs)
+
+find_package_handle_standard_args(LIBUCLIENT DEFAULT_MSG LIBUCLIENT_LIBRARY LIBUCLIENT_INCLUDE_DIR)
+
+mark_as_advanced(LIBUCLIENT_INCLUDE_DIR LIBUCLIENT_LIBRARY)
