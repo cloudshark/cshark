@@ -60,9 +60,13 @@ struct cshark {
 
 extern struct cshark cshark;
 
+#ifdef WITH_DEBUG
 #define DEBUG(fmt, ...) do { \
 		fprintf(stderr, "%s: %s(%d): " fmt, PROJECT_NAME, __func__, __LINE__, ## __VA_ARGS__); \
 	} while (0)
+#else
+#define DEBUG( ... )
+#endif
 
 #define LOG(fmt, ...) do { \
 		syslog(0, fmt, ## __VA_ARGS__); \

@@ -20,6 +20,10 @@ set(SOURCES
 
 add_executable(cshark ${SOURCES})
 
+if(WITH_DEBUG)
+  add_definitions(-DWITH_DEBUG -g3)
+endif()
+
 find_package(LIBUBOX REQUIRED)
 include_directories(${LIBUBOX_INCLUDE_DIR})
 target_link_libraries(cshark ${LIBUBOX_LIBRARIES})
