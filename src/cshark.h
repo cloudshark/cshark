@@ -53,7 +53,8 @@ struct cshark {
 	pcap_dumper_t *p_dumper;
 	struct bpf_program p_bfp;
 
-	int packets;
+	uint32_t packets;
+	uint32_t limit_packets;
 
 	struct uclient *ucl;
 };

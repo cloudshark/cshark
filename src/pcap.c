@@ -39,9 +39,13 @@ void cshark_pcap_manage_packet(u_char *user, const struct pcap_pkthdr *header, c
 {
 	struct cshark *cs = (struct cshark *) user;
 
-	pcap_dump((u_char *)cs->p_dumper, header, sp);
-
 	cs->packets++;
+	if (cs->limit_packets && (cs->limit_packets < cs->packets)) {
+		uloop_end();
+		return;
+	}
+
+	pcap_dump((u_char *)cs->p_dumper, header, sp);
 }
 
 void cshark_pcap_handle_packet_cb(struct uloop_fd *ufd, __unused unsigned int events)

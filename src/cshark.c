@@ -54,6 +54,7 @@ static void show_help()
 		"  -s  snarf snaplen bytes of data\n" \
 		"  -k  keep the file after uploading it to cloudshark.org\n" \
 		"  -T  stop capture after timeout (in seconds), use 0 for no timeout\n" \
+		"  -P  stop capture after capturing this many packets, use 0 for no limit\n" \
 		"  -h  shows this help\n");
 }
 
@@ -76,10 +77,12 @@ int main(int argc, char *argv[])
 	cshark.filename = NULL;
 	cshark.snaplen = 65535;
 	cshark.filter = NULL;
+	cshark.packets = 0;
+	cshark.limit_packets = 0;
 
 	openlog(PROJECT_NAME, LOG_PERROR | LOG_PID, LOG_DAEMON);
 
-	while ((c = getopt(argc, argv, "i:w:s:T:kh")) != -1) {
+	while ((c = getopt(argc, argv, "i:w:s:T:P:kh")) != -1) {
 		switch (c) {
 			case 'i':
 				cshark.interface = optarg;
@@ -106,6 +109,9 @@ int main(int argc, char *argv[])
 
 				break;
 			}
+			case 'P':
+				cshark.limit_packets = atoi(optarg);
+				break;
 
 			case 'k':
 				keep = 1;
