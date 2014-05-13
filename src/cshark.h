@@ -56,6 +56,9 @@ struct cshark {
 	uint32_t packets;
 	uint32_t limit_packets;
 
+	uint32_t caplen;
+	uint32_t limit_caplen;
+
 	struct uclient *ucl;
 };
 

@@ -45,6 +45,12 @@ void cshark_pcap_manage_packet(u_char *user, const struct pcap_pkthdr *header, c
 		return;
 	}
 
+	cs->caplen += header->caplen;
+	if (cs->limit_caplen && (cs->limit_caplen < cs->caplen)) {
+		uloop_end();
+		return;
+	}
+
 	pcap_dump((u_char *)cs->p_dumper, header, sp);
 }
 
@@ -57,6 +63,7 @@ void cshark_pcap_handle_packet_cb(struct uloop_fd *ufd, __unused unsigned int ev
 		return;
 
 	DEBUG("received '%d' packets\n", cshark.packets);
+	DEBUG("received '%d' bytes\n", cshark.caplen);
 }
 
 int cshark_pcap_init(struct cshark *cs)

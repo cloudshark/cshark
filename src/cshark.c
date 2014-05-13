@@ -53,8 +53,9 @@ static void show_help()
 		"  -w  write the raw packets to specific file\n" \
 		"  -s  snarf snaplen bytes of data\n" \
 		"  -k  keep the file after uploading it to cloudshark.org\n" \
-		"  -T  stop capture after timeout (in seconds), use 0 for no timeout\n" \
-		"  -P  stop capture after capturing this many packets, use 0 for no limit\n" \
+		"  -T  stop capture after this many seconds have passed, use 0 for no timeout\n" \
+		"  -P  stop capture after this many packets have been captured, use 0 for no limit\n" \
+		"  -S  stop capture after this many bytes have been saved, use 0 for no limit\n" \
 		"  -h  shows this help\n");
 }
 
@@ -79,10 +80,12 @@ int main(int argc, char *argv[])
 	cshark.filter = NULL;
 	cshark.packets = 0;
 	cshark.limit_packets = 0;
+	cshark.caplen = 0;
+	cshark.limit_caplen = 0;
 
 	openlog(PROJECT_NAME, LOG_PERROR | LOG_PID, LOG_DAEMON);
 
-	while ((c = getopt(argc, argv, "i:w:s:T:P:kh")) != -1) {
+	while ((c = getopt(argc, argv, "i:w:s:T:P:S:kh")) != -1) {
 		switch (c) {
 			case 'i':
 				cshark.interface = optarg;
@@ -111,6 +114,10 @@ int main(int argc, char *argv[])
 			}
 			case 'P':
 				cshark.limit_packets = atoi(optarg);
+				break;
+
+			case 'S':
+				cshark.limit_caplen = atoi(optarg);
 				break;
 
 			case 'k':
