@@ -53,7 +53,14 @@ static void show_help()
 		"  -w  write the raw packets to specific file\n" \
 		"  -s  snarf snaplen bytes of data\n" \
 		"  -k  keep the file after uploading it to cloudshark.org\n" \
+		"  -T  stop capture after timeout (in seconds), use 0 for no timeout\n" \
 		"  -h  shows this help\n");
+}
+
+static void dump_timeout_callback(struct uloop_timeout *t)
+{
+	DEBUG("timeout reached, stopping capture\n");
+	uloop_end();
 }
 
 int main(int argc, char *argv[])
@@ -72,7 +79,7 @@ int main(int argc, char *argv[])
 
 	openlog(PROJECT_NAME, LOG_PERROR | LOG_PID, LOG_DAEMON);
 
-	while ((c = getopt(argc, argv, "i:w:s:kh")) != -1) {
+	while ((c = getopt(argc, argv, "i:w:s:T:kh")) != -1) {
 		switch (c) {
 			case 'i':
 				cshark.interface = optarg;
@@ -86,6 +93,19 @@ int main(int argc, char *argv[])
 				cshark.snaplen = atoi(optarg);
 				if (!cshark.snaplen) cshark.snaplen = 65535;
 				break;
+
+			case 'T':
+			{
+				struct uloop_timeout dump_timeout = {
+					.cb = dump_timeout_callback
+				};
+
+				int dump_timeout_s = atoi(optarg);
+				if (dump_timeout_s > 0)
+					uloop_timeout_set(&dump_timeout, dump_timeout_s * 1000);
+
+				break;
+			}
 
 			case 'k':
 				keep = 1;
