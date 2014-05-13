@@ -48,7 +48,7 @@ struct cshark cshark;
 
 static void show_help()
 {
-	printf("usage: %s [-iwskTh] [ expression ]\n\n%s", PROJECT_NAME, \
+	printf("usage: %s [-iwskTPSh] [ expression ]\n\n%s", PROJECT_NAME, \
 		"  -i  listen on interface\n" \
 		"  -w  write the raw packets to specific file\n" \
 		"  -s  snarf snaplen bytes of data\n" \
