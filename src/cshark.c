@@ -48,7 +48,7 @@ struct cshark cshark;
 
 static void show_help()
 {
-	printf("usage: %s [-iwskTPSh] [ expression ]\n\n%s", PROJECT_NAME, \
+	printf("usage: %s [-iwskTPSph] [ expression ]\n\n%s", PROJECT_NAME, \
 		"  -i  listen on interface\n" \
 		"  -w  write the raw packets to specific file\n" \
 		"  -s  snarf snaplen bytes of data\n" \
@@ -56,6 +56,7 @@ static void show_help()
 		"  -T  stop capture after this many seconds have passed, use 0 for no timeout\n" \
 		"  -P  stop capture after this many packets have been captured, use 0 for no limit\n" \
 		"  -S  stop capture after this many bytes have been saved, use 0 for no limit\n" \
+		"  -p  save pid to a file\n" \
 		"  -h  shows this help\n");
 }
 
@@ -69,6 +70,7 @@ int main(int argc, char *argv[])
 {
 	int rc, c;
 	int keep = 0;
+	char *pid_filename = NULL;
 
 	/* zero out main struct */
 	memset(&cshark, 0, sizeof(cshark));
@@ -85,7 +87,7 @@ int main(int argc, char *argv[])
 
 	openlog(PROJECT_NAME, LOG_PERROR | LOG_PID, LOG_DAEMON);
 
-	while ((c = getopt(argc, argv, "i:w:s:T:P:S:kh")) != -1) {
+	while ((c = getopt(argc, argv, "i:w:s:T:P:S:p:kh")) != -1) {
 		switch (c) {
 			case 'i':
 				cshark.interface = optarg;
@@ -112,6 +114,7 @@ int main(int argc, char *argv[])
 
 				break;
 			}
+
 			case 'P':
 				cshark.limit_packets = atoi(optarg);
 				break;
@@ -119,6 +122,25 @@ int main(int argc, char *argv[])
 			case 'S':
 				cshark.limit_caplen = atoi(optarg);
 				break;
+
+			case 'p':
+			{
+				pid_t pid = getpid();
+
+				pid_filename = optarg;
+				FILE *f = fopen(pid_filename, "w");
+				if (!f) {
+					fprintf(stderr, "Failed writing PID to '%s'\n", optarg);
+					return EXIT_FAILURE;
+				}
+
+				fprintf(f, "%d\n", pid);
+
+				fclose(f);
+				sync();
+
+				break;
+			}
 
 			case 'k':
 				keep = 1;
@@ -186,6 +208,7 @@ exit:
 	cshark_pcap_done(&cshark);
 	cshark_uclient_done(&cshark);
 	if (!keep) remove(cshark.filename);
+	if (pid_filename) remove(pid_filename);
 
 	return rc;
 }
