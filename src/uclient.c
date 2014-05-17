@@ -166,8 +166,17 @@ int cshark_uclient_init(struct cshark *cs)
 
 	uclient_http_set_ssl_ctx(cs->ucl, ssl_ops, ssl_ctx, true);
 
-	uclient_connect(cs->ucl);
-	uclient_http_set_request_type(cs->ucl, "PUT");
+	rc = uclient_connect(cs->ucl);
+	if (rc) {
+		ERROR("%s: could not connect to '%s'\n", PROJECT_NAME, url);
+		goto exit;
+	}
+
+	rc = uclient_http_set_request_type(cs->ucl, "PUT");
+	if (rc) {
+		ERROR("uclient: could not set request type\n");
+		goto exit;
+	}
 
 	fd = fopen(cs->filename, "rb");
 	if (fd == NULL) {
@@ -180,13 +189,24 @@ int cshark_uclient_init(struct cshark *cs)
 	fseek(fd, 0L, SEEK_SET);
 
 	snprintf(capture_length_str, 32, "%d", capture_length);
-	uclient_http_set_header(cs->ucl, "Content-Length", capture_length_str);
-
-	while ((len = fread(buf, sizeof(char), BUFSIZ, fd)) != 0) {
-		uclient_write(cs->ucl, buf, len);
+	rc = uclient_http_set_header(cs->ucl, "Content-Length", capture_length_str);
+	if (rc) {
+		ERROR("uclient: could not set header\n");
+		goto exit;
 	}
 
-	uclient_request(cs->ucl);
+	while ((len = fread(buf, sizeof(char), BUFSIZ, fd)) != 0) {
+		rc = uclient_write(cs->ucl, buf, len);
+		if (rc != -1) {
+			break;
+		}
+	}
+
+	rc = uclient_request(cs->ucl);
+	if (rc) {
+		ERROR("uclient: request failed\n");
+		goto exit;
+	}
 
 	rc = 0;
 exit:
