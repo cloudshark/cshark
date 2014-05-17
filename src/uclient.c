@@ -41,6 +41,15 @@
 static struct ustream_ssl_ctx *ssl_ctx;
 static const struct ustream_ssl_ops *ssl_ops;
 
+static void cshark_header_done_cb(struct uclient *ucl)
+{
+	if (ucl->status_code != 200) {
+		ERROR("%s: received error, please double check your config file\n", PROJECT_NAME);
+		uclient_disconnect(ucl);
+		uloop_end();
+	}
+}
+
 static void cshark_uclient_read_data_cb(struct uclient *ucl)
 {
 	char buf[256];
@@ -95,15 +104,15 @@ static void cshark_uclient_error_cb(struct uclient *ucl, int code)
 
         switch(code) {
 		case UCLIENT_ERROR_CONNECT:
-			printf("%s: connection failed\n", PROJECT_NAME);
+			ERROR("%s: connection failed\n", PROJECT_NAME);
 			e = true;
 			break;
 		case UCLIENT_ERROR_SSL_INVALID_CERT:
-			printf("%s: invalid SSL certificate\n", PROJECT_NAME);
+			ERROR("%s: invalid SSL certificate\n", PROJECT_NAME);
 			e = true;
 			break;
 		case UCLIENT_ERROR_SSL_CN_MISMATCH:
-			printf("%s: server hostname does not match SSL certificate\n", PROJECT_NAME);
+			ERROR("%s: server hostname does not match SSL certificate\n", PROJECT_NAME);
 			e = true;
 			break;
 		default:
@@ -117,6 +126,7 @@ static void cshark_uclient_error_cb(struct uclient *ucl, int code)
 }
 
 static const struct uclient_cb cb = {
+	.header_done = cshark_header_done_cb,
 	.data_read = cshark_uclient_read_data_cb,
 	.data_eof = cshark_uclient_eof_cb,
 	.error = cshark_uclient_error_cb,
