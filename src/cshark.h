@@ -42,6 +42,7 @@
 #include <libubox/uclient.h>
 
 #define PROJECT_NAME "cshark"
+#define PROJECT_VERSION "v0.1"
 
 struct cshark {
 	char *interface;

@@ -48,7 +48,7 @@ struct cshark cshark;
 
 static void show_help()
 {
-	printf("usage: %s [-iwskTPSph] [ expression ]\n\n%s", PROJECT_NAME, \
+	printf("usage: %s [-iwskTPSpvh] [ expression ]\n\n%s", PROJECT_NAME, \
 		"  -i  listen on interface\n" \
 		"  -w  write the raw packets to specific file\n" \
 		"  -s  snarf snaplen bytes of data\n" \
@@ -57,6 +57,7 @@ static void show_help()
 		"  -P  stop capture after this many packets have been captured, use 0 for no limit\n" \
 		"  -S  stop capture after this many bytes have been saved, use 0 for no limit\n" \
 		"  -p  save pid to a file\n" \
+		"  -v  shows version\n" \
 		"  -h  shows this help\n");
 }
 
@@ -87,7 +88,7 @@ int main(int argc, char *argv[])
 
 	openlog(PROJECT_NAME, LOG_PERROR | LOG_PID, LOG_DAEMON);
 
-	while ((c = getopt(argc, argv, "i:w:s:T:P:S:p:kh")) != -1) {
+	while ((c = getopt(argc, argv, "i:w:s:T:P:S:p:kvh")) != -1) {
 		switch (c) {
 			case 'i':
 				cshark.interface = optarg;
@@ -145,6 +146,10 @@ int main(int argc, char *argv[])
 			case 'k':
 				keep = 1;
 				break;
+
+			case 'v':
+				printf("%s version %s\n", PROJECT_NAME, PROJECT_VERSION);
+				return EXIT_FAILURE;
 
 			case 'h':
 				show_help();
