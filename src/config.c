@@ -45,13 +45,15 @@ enum cshark_config {
 	CSHARK_URL,
 	CSHARK_TOKEN,
 	CSHARK_CA,
+	CSHARK_DIR,
 	__CSHARK_MAX
 };
 
 const struct blobmsg_policy cshark_policy[__CSHARK_MAX] = {
 	[CSHARK_URL] = { .name = "url", .type = BLOBMSG_TYPE_STRING },
 	[CSHARK_TOKEN] = { .name = "token", .type = BLOBMSG_TYPE_STRING },
-	[CSHARK_CA] = { .name = "ca", .type = BLOBMSG_TYPE_STRING }
+	[CSHARK_CA] = { .name = "ca", .type = BLOBMSG_TYPE_STRING },
+	[CSHARK_DIR] = { .name = "dir", .type = BLOBMSG_TYPE_STRING }
 };
 
 const struct uci_blob_param_list config_attr_list = {
@@ -87,8 +89,8 @@ int config_load(void)
 	snprintf(config.url, URL_MAX, "%s", blobmsg_get_string(c));
 
 	/* we are adding '/' later in the code */
-	if (config.url[strlen(config.url)] == '/') {
-		config.url[strlen(config.url)] = 0;
+	if (config.url[strlen(config.url) - 1] == '/') {
+		config.url[strlen(config.url) - 1] = 0;
 	}
 
 	if (!(c = tb[CSHARK_TOKEN])) {
@@ -102,6 +104,18 @@ int config_load(void)
 		memset(config.ca, 0, PATH_MAX);
 	} else {
 		snprintf(config.ca, PATH_MAX, "%s", blobmsg_get_string(c));
+	}
+
+	/* dir option is optional */
+	if (!(c = tb[CSHARK_DIR])) {
+		snprintf(config.dir, PATH_MAX, "/tmp");
+	} else {
+		snprintf(config.dir, PATH_MAX, "%s", blobmsg_get_string(c));
+	}
+
+	/* we are adding '/' later in the code */
+	if (config.dir[strlen(config.dir) - 1] == '/') {
+		config.dir[strlen(config.dir) - 1] = 0;
 	}
 
 	rc = 0;

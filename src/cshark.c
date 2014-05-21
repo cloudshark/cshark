@@ -166,22 +166,33 @@ int main(int argc, char *argv[])
 		optind++;
 	}
 
-	if (!cshark.filename) {
-		cshark.filename = strdup("/tmp/cshark.pcap-XXXXXX");
-
-		int fd = mkstemp(cshark.filename);
-		if (fd == -1) {
-			ERROR("unable to create dump file\n");
-			return	EXIT_FAILURE;
-		}
-	}
-
 	rc = config_load();
 	if (rc) {
 		ERROR("unable to load configuration\n");
 		rc = EXIT_FAILURE;
 		goto exit;
 	}
+
+	if (!cshark.filename) {
+		int len = 0;
+		len = snprintf(cshark.filename, 0, "%s/cshark.pcap-XXXXXX", config.dir);
+
+		cshark.filename = calloc(len + 1, sizeof(char));
+		if (!cshark.filename) {
+			ERROR("not enough memory\n");
+			rc = EXIT_FAILURE;
+			goto exit;
+		}
+		snprintf(cshark.filename, len + 1, "%s/cshark.pcap-XXXXXX", config.dir);
+
+		int fd = mkstemp(cshark.filename);
+		if (fd == -1) {
+			ERROR("unable to create dump file\n");
+			rc = EXIT_FAILURE;
+			goto exit;
+		}
+	}
+
 
 	uloop_init();
 
@@ -212,6 +223,7 @@ int main(int argc, char *argv[])
 exit:
 	cshark_pcap_done(&cshark);
 	cshark_uclient_done(&cshark);
+	free(cshark.filename);
 	if (!keep) remove(cshark.filename);
 	if (pid_filename) remove(pid_filename);
 

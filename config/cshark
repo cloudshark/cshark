@@ -6,3 +6,4 @@ config cshark
 	option url 'https://openwrt.cloudshark.org'
 	option token '4fffb380713323c47b05ad153332a436'
 	option ca '/etc/ssl/certs/ca-the_usertrust_network.pem'
+	option dir '/tmp/'
