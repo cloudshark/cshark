@@ -95,7 +95,12 @@ int main(int argc, char *argv[])
 				break;
 
 			case 'w':
-				cshark.filename = optarg;
+				cshark.filename = strdup(optarg);
+				if (!cshark.filename) {
+					ERROR("not enough memory\n");
+					rc = EXIT_FAILURE;
+					goto exit;
+				}
 				break;
 
 			case 's':
