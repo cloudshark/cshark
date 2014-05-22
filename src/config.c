@@ -47,6 +47,7 @@ enum cshark_config {
 	CSHARK_CA,
 	CSHARK_CA_VERIFY,
 	CSHARK_DIR,
+	CSHARK_TAGS,
 	__CSHARK_MAX
 };
 
@@ -55,7 +56,8 @@ const struct blobmsg_policy cshark_policy[__CSHARK_MAX] = {
 	[CSHARK_TOKEN] = { .name = "token", .type = BLOBMSG_TYPE_STRING },
 	[CSHARK_CA] = { .name = "ca", .type = BLOBMSG_TYPE_STRING },
 	[CSHARK_CA_VERIFY] = { .name = "ca_verify", .type = BLOBMSG_TYPE_BOOL },
-	[CSHARK_DIR] = { .name = "dir", .type = BLOBMSG_TYPE_STRING }
+	[CSHARK_DIR] = { .name = "dir", .type = BLOBMSG_TYPE_STRING },
+	[CSHARK_TAGS] = { .name = "tags", .type = BLOBMSG_TYPE_STRING },
 };
 
 const struct uci_blob_param_list config_attr_list = {
@@ -120,6 +122,13 @@ int config_load(void)
 		snprintf(config.dir, PATH_MAX, "/tmp");
 	} else {
 		snprintf(config.dir, PATH_MAX, "%s", blobmsg_get_string(c));
+	}
+
+	/* tags option is optional */
+	if (!(c = tb[CSHARK_TAGS])) {
+		memset(config.tags, 0, TAGS_MAX);
+	} else {
+		snprintf(config.tags, TAGS_MAX, "%s", blobmsg_get_string(c));
 	}
 
 	/* we are adding '/' later in the code */

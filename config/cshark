@@ -8,3 +8,4 @@ config cshark
 	option ca '/etc/ssl/certs/ca-the_usertrust_network.pem'
 	option ca_verify '1'
 	option dir '/tmp/'
+        option tags ''
