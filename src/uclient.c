@@ -207,7 +207,7 @@ int cshark_uclient_init(struct cshark *cs)
 
 	while ((len = fread(buf, sizeof(char), BUFSIZ, fd)) != 0) {
 		rc = uclient_write(cs->ucl, buf, len);
-		if (rc != -1) {
+		if (rc == -1) {
 			break;
 		}
 	}
