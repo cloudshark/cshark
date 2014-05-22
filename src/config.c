@@ -45,6 +45,7 @@ enum cshark_config {
 	CSHARK_URL,
 	CSHARK_TOKEN,
 	CSHARK_CA,
+	CSHARK_CA_VERIFY,
 	CSHARK_DIR,
 	__CSHARK_MAX
 };
@@ -53,6 +54,7 @@ const struct blobmsg_policy cshark_policy[__CSHARK_MAX] = {
 	[CSHARK_URL] = { .name = "url", .type = BLOBMSG_TYPE_STRING },
 	[CSHARK_TOKEN] = { .name = "token", .type = BLOBMSG_TYPE_STRING },
 	[CSHARK_CA] = { .name = "ca", .type = BLOBMSG_TYPE_STRING },
+	[CSHARK_CA_VERIFY] = { .name = "ca_verify", .type = BLOBMSG_TYPE_BOOL },
 	[CSHARK_DIR] = { .name = "dir", .type = BLOBMSG_TYPE_STRING }
 };
 
@@ -104,6 +106,13 @@ int config_load(void)
 		memset(config.ca, 0, PATH_MAX);
 	} else {
 		snprintf(config.ca, PATH_MAX, "%s", blobmsg_get_string(c));
+	}
+
+	/* ca_verify option is optional */
+	if (!(c = tb[CSHARK_CA_VERIFY])) {
+		config.ca_verify = true;
+	} else {
+		config.ca_verify = blobmsg_get_bool(c);
 	}
 
 	/* dir option is optional */

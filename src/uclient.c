@@ -174,7 +174,7 @@ int cshark_uclient_init(struct cshark *cs)
 
 	cs->ucl = uclient_new(url, NULL, &cb);
 
-	uclient_http_set_ssl_ctx(cs->ucl, ssl_ops, ssl_ctx, true);
+	uclient_http_set_ssl_ctx(cs->ucl, ssl_ops, ssl_ctx, config.ca_verify);
 
 	rc = uclient_connect(cs->ucl);
 	if (rc) {

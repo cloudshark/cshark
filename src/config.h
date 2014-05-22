@@ -42,6 +42,7 @@ struct config {
 	char url[URL_MAX];
 	char token[TOKEN_MAX];
 	char ca[PATH_MAX];
+	bool ca_verify;
 	char dir[PATH_MAX];
 };
 
