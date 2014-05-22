@@ -57,7 +57,7 @@ const struct blobmsg_policy cshark_policy[__CSHARK_MAX] = {
 	[CSHARK_CA] = { .name = "ca", .type = BLOBMSG_TYPE_STRING },
 	[CSHARK_CA_VERIFY] = { .name = "ca_verify", .type = BLOBMSG_TYPE_BOOL },
 	[CSHARK_DIR] = { .name = "dir", .type = BLOBMSG_TYPE_STRING },
-	[CSHARK_TAGS] = { .name = "tags", .type = BLOBMSG_TYPE_STRING },
+	[CSHARK_TAGS] = { .name = "tags", .type = BLOBMSG_TYPE_STRING }
 };
 
 const struct uci_blob_param_list config_attr_list = {
