@@ -31,11 +31,10 @@
 #ifndef __CONFIG_H__
 #define __CONFIG_H__
 
-#include "limits.h"
+#include <limits.h>
 
 #define TOKEN_MAX 32 + 1
 #define URL_MAX 8 + HOST_NAME_MAX + 7 + 1
-#define TAGS_MAX 256
 
 int config_load(void);
 
@@ -45,7 +44,7 @@ struct config {
 	char ca[PATH_MAX];
 	bool ca_verify;
 	char dir[PATH_MAX];
-	char tags[TAGS_MAX];
+	char tags[BUFSIZ];
 };
 
 extern struct config config;

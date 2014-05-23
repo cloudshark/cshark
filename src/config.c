@@ -126,9 +126,9 @@ int config_load(void)
 
 	/* tags option is optional */
 	if (!(c = tb[CSHARK_TAGS])) {
-		memset(config.tags, 0, TAGS_MAX);
+		memset(config.tags, 0, BUFSIZ);
 	} else {
-		snprintf(config.tags, TAGS_MAX, "%s", blobmsg_get_string(c));
+		snprintf(config.tags, BUFSIZ, "%s", blobmsg_get_string(c));
 	}
 
 	/* we are adding '/' later in the code */
