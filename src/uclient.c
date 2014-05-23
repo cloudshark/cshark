@@ -102,7 +102,7 @@ static void cshark_uclient_error_cb(struct uclient *ucl, int code)
 {
 	bool e = false;
 
-        switch(code) {
+	switch(code) {
 		case UCLIENT_ERROR_CONNECT:
 			ERROR("%s: connection failed\n", PROJECT_NAME);
 			e = true;
@@ -161,13 +161,13 @@ int cshark_uclient_init(struct cshark *cs)
 	int rc = -1;
 
 	if (strcmp(config.tags,"") != 0 ) {
-          /* include the additional tags parameter */
-	  snprintf(extra_tags, BUFSIZ, "?additional_tags=%s", config.tags);
+		/* include the additional tags parameter */
+		snprintf(extra_tags, BUFSIZ, "?additional_tags=%s", config.tags);
 
-        } else {
-          /* no additional tags specified */
-          extra_tags[0] = 0;
-        }
+	} else {
+		/* no additional tags specified */
+		extra_tags[0] = 0;
+	}
 
 	len = snprintf(url, BUFSIZ, "%s/api/v1/%s/upload%s", config.url, config.token, extra_tags);
 	if (len < 0 || len >= BUFSIZ) {
