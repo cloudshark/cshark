@@ -52,6 +52,13 @@ void cshark_pcap_manage_packet(u_char *user, const struct pcap_pkthdr *header, c
 	}
 
 	pcap_dump((u_char *)cs->p_dumper, header, sp);
+
+	if (pcap_dump_flush( cs->p_dumper ) < 0 ) {
+		ERROR("pcap: error writting capture file\n");
+		uloop_end();
+		return;
+	}
+
 }
 
 void cshark_pcap_handle_packet_cb(struct uloop_fd *ufd, __unused unsigned int events)
