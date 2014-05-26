@@ -76,8 +76,8 @@ static uint64_t cshark_max_caplen( char *path )
                 ERROR("Unable to determine free disk space for %s\n", path);
                 return 0;
         } else {
-                /* Allow up to 90% of remaining space */
-                return (uint64_t) (result.f_bsize * result.f_bfree * 0.9);
+                /* Allow up to 50% of remaining space */
+                return (uint64_t) (result.f_bsize * result.f_bfree * 0.5);
         }
 }
 
@@ -213,7 +213,7 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	/* Always set a max capture file to prevent filling up the disk */
+	/* Always set a max capture len to prevent filling up the disk/memory */
 	max_caplen = cshark_max_caplen( cshark.filename );
 	if ( !cshark.limit_caplen || cshark.limit_caplen > max_caplen ) {
 		cshark.limit_caplen = max_caplen;
