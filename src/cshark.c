@@ -249,8 +249,8 @@ int main(int argc, char *argv[])
 exit:
 	cshark_pcap_done(&cshark);
 	cshark_uclient_done(&cshark);
-	free(cshark.filename);
 	if (!keep) remove(cshark.filename);
+	free(cshark.filename);
 	if (pid_filename) remove(pid_filename);
 
 	return rc;
