@@ -35,6 +35,17 @@
 
 struct uloop_fd ufd_pcap = { .cb = cshark_pcap_handle_packet_cb };
 
+struct pcap_timeval {
+	bpf_int32 tv_sec; /* seconds */
+	bpf_int32 tv_usec; /* microseconds */
+};
+
+struct pcap_sf_pkthdr {
+	struct pcap_timeval ts; /* time stamp */
+	bpf_u_int32 caplen; /* length of portion present */
+	bpf_u_int32 len; /* length this packet (off wire) */
+};
+
 void cshark_pcap_manage_packet(u_char *user, const struct pcap_pkthdr *header, const u_char *sp)
 {
 	struct cshark *cs = (struct cshark *) user;
@@ -51,7 +62,27 @@ void cshark_pcap_manage_packet(u_char *user, const struct pcap_pkthdr *header, c
 		return;
 	}
 
-	pcap_dump((u_char *)cs->p_dumper, header, sp);
+	/* pcap_dump does not handle errors so make fixes here instead */
+
+	struct pcap_sf_pkthdr sf_hdr;
+	size_t num = 0;		
+
+	sf_hdr.ts.tv_sec = header->ts.tv_sec;
+	sf_hdr.ts.tv_usec = header->ts.tv_usec;
+	sf_hdr.caplen = header->caplen;
+	sf_hdr.len = header->len;
+
+	num = fwrite(&sf_hdr, sizeof(sf_hdr), 1, (FILE *) cs->p_dumper);
+	if (num != 1) {
+		uloop_end();
+		return;
+	}
+
+	num = fwrite(sp, header->caplen, 1, (FILE *) cs->p_dumper);
+	if (num != 1) {
+		uloop_end();
+		return;
+	}
 }
 
 void cshark_pcap_handle_packet_cb(struct uloop_fd *ufd, __unused unsigned int events)
@@ -62,8 +93,8 @@ void cshark_pcap_handle_packet_cb(struct uloop_fd *ufd, __unused unsigned int ev
 	if (rc < 0)
 		return;
 
-	DEBUG("received '%d' packets\n", cshark.packets);
-	DEBUG("received '%d' bytes\n", cshark.caplen);
+	DEBUG("received '%d' packets\n", (int) cshark.packets);
+	DEBUG("received '%d' bytes\n", (int) cshark.caplen);
 }
 
 int cshark_pcap_init(struct cshark *cs)
