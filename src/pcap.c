@@ -28,12 +28,15 @@
  * [1] https://www.cloudshark.org/
  */
 
+#include <sys/vfs.h>
+
 #include <libubox/uloop.h>
 
 #include "cshark.h"
 #include "pcap.h"
 
 struct uloop_fd ufd_pcap = { .cb = cshark_pcap_handle_packet_cb };
+static char *filename = NULL;
 
 struct pcap_timeval {
 	bpf_int32 tv_sec; /* seconds */
@@ -90,8 +93,25 @@ void cshark_pcap_handle_packet_cb(struct uloop_fd *ufd, __unused unsigned int ev
 	int rc;
 
 	rc = pcap_dispatch(cshark.p, -1, cshark_pcap_manage_packet, (u_char *) &cshark);
-	if (rc < 0)
+	if (rc < 0) {
+		uloop_end();
 		return;
+	}
+
+	struct statfs result;
+
+	if (statfs(filename, &result) < 0 ) {
+		ERROR("unable to determine free disk space for '%s'\n", filename);
+		uloop_end();
+		return;
+	}
+
+	/* leave a bit less then 512K of disk space available */
+	if ((result.f_bsize * result.f_bfree) < (512 * 1024)) {
+		DEBUG("stopping capture due to low disk space\n");
+		uloop_end();
+		return;
+	}
 
 	DEBUG("received '%d' packets\n", (int) cshark.packets);
 	DEBUG("received '%d' bytes\n", (int) cshark.caplen);
@@ -132,6 +152,9 @@ int cshark_pcap_init(struct cshark *cs)
 		rc = EXIT_FAILURE;
 		goto exit;
 	}
+
+	/* we need to access this value in one of the callbacks */
+	filename = cs->filename;
 
 	/* set non-blocking state */
 	rc = pcap_setnonblock(cs->p, 1, e);

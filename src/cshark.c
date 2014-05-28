@@ -33,7 +33,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/vfs.h>
 
 #include <pcap.h>
 
@@ -68,24 +67,10 @@ static void dump_timeout_callback(struct uloop_timeout *t)
 	uloop_end();
 }
 
-static uint64_t cshark_max_caplen(char *path)
-{
-	struct statfs result;
-
-	if (statfs(path, &result) < 0 ) {
-		ERROR("Unable to determine free disk space for %s\n", path);
-		return 0;
-	} else {
-		/* Allow up to 50% of remaining space */
-		return (uint64_t) (result.f_bsize * result.f_bfree * 0.5);
-	}
-}
-
 int main(int argc, char *argv[])
 {
 	int rc, c;
 	int keep = 0;
-	uint64_t max_caplen;
 	char *pid_filename = NULL;
 
 	/* zero out main struct */
@@ -212,12 +197,6 @@ int main(int argc, char *argv[])
 			goto exit;
 		}
 	}
-
-	/* Always set a max capture len to prevent filling up the disk/memory */
-	max_caplen = cshark_max_caplen(cshark.filename);
-	if (!cshark.limit_caplen || cshark.limit_caplen > max_caplen) {
-		cshark.limit_caplen = max_caplen;
-	}	
 
 	uloop_init();
 
