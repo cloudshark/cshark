@@ -52,6 +52,28 @@ struct pcap_sf_pkthdr {
 void cshark_pcap_manage_packet(u_char *user, const struct pcap_pkthdr *header, const u_char *sp)
 {
 	struct cshark *cs = (struct cshark *) user;
+	static int stop_writing = false;
+	struct statfs result;
+
+	if (stop_writing) return;
+
+	/* no need to check on every packet so check on every 10th that comes along */
+	if (cs->packets % 10) {
+		if (statfs(filename, &result) < 0 ) {
+			ERROR("unable to determine free disk space for '%s'\n", filename);
+			stop_writing = true;
+			uloop_end();
+			return;
+		}
+
+		/* leave a bit less then 512K of disk space available */
+		if ((result.f_bsize * result.f_bfree) < (512 * 1024)) {
+			DEBUG("stopping capture due to low disk space\n");
+			stop_writing = true;
+			uloop_end();
+			return;
+		}
+	}
 
 	cs->packets++;
 	if (cs->limit_packets && (cs->limit_packets < cs->packets)) {
@@ -94,21 +116,6 @@ void cshark_pcap_handle_packet_cb(struct uloop_fd *ufd, __unused unsigned int ev
 
 	rc = pcap_dispatch(cshark.p, -1, cshark_pcap_manage_packet, (u_char *) &cshark);
 	if (rc < 0) {
-		uloop_end();
-		return;
-	}
-
-	struct statfs result;
-
-	if (statfs(filename, &result) < 0 ) {
-		ERROR("unable to determine free disk space for '%s'\n", filename);
-		uloop_end();
-		return;
-	}
-
-	/* leave a bit less then 512K of disk space available */
-	if ((result.f_bsize * result.f_bfree) < (512 * 1024)) {
-		DEBUG("stopping capture due to low disk space\n");
 		uloop_end();
 		return;
 	}
