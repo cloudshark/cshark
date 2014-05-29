@@ -139,7 +139,43 @@ int config_load(void)
 	rc = 0;
 exit:
 	blob_buf_free(&buf);
-	uci_unload(uci, conf);
+	if (conf) (void) uci_unload(uci, conf);
+	uci_free_context(uci);
+
+	return rc;
+}
+
+int config_save_url(char *url)
+{
+	struct uci_context *uci = uci_alloc_context();
+	struct uci_package *conf = NULL;
+	struct uci_ptr ptr;
+	char buf[BUFSIZ];
+	int rc;
+
+	rc = uci_load(uci, "cshark", &conf);
+	if (rc) goto exit;
+
+	memset(&ptr, 0, sizeof(ptr));
+	ptr.package = "cshark";
+	ptr.section = "cshark";
+	ptr.option  = "entry";
+
+	snprintf(buf, BUFSIZ, "%s,%d", url, (int) time(NULL));	
+	ptr.value = buf;
+
+	rc = uci_add_list(uci, &ptr);
+	if (rc) goto exit;
+
+	rc = uci_save(uci, conf);
+	if (rc) goto exit;
+
+	rc = uci_commit(uci, &conf, false);
+	if (rc) goto exit;
+
+	rc = 0;
+exit:
+	if (conf) (void) uci_unload(uci, conf);
 	uci_free_context(uci);
 
 	return rc;

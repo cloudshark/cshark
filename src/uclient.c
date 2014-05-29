@@ -52,18 +52,19 @@ static void cshark_header_done_cb(struct uclient *ucl)
 
 static void cshark_uclient_read_data_cb(struct uclient *ucl)
 {
-	char buf[256];
+	char buf[BUFSIZ];
 	int len;
 	json_object *json_obj = NULL, *obj;
 	json_tokener *json_tok;
 	enum json_tokener_error jerr;
+	int rc;
 
 	json_tok = json_tokener_new();
 
 	do {
-		len = uclient_read(ucl, buf, sizeof(buf));
+		len = uclient_read(ucl, buf, BUFSIZ);
 		if (len == -1) {
-			ERROR("error while reading response \n");
+			ERROR("error while reading response\n");
 			goto exit;
 		}
 		if (len == 0) {
@@ -84,7 +85,10 @@ static void cshark_uclient_read_data_cb(struct uclient *ucl)
 	if (!exists) goto exit;
 
 	printf("... uploading completed!\n");
-	printf("%s/captures/%s\n", config.url, json_object_get_string(obj));
+	snprintf(buf, BUFSIZ, "%s/captures/%s", config.url, json_object_get_string(obj));
+	printf("%s\n", buf);
+	rc = config_save_url(buf);
+	if (rc) ERROR("error while saving url to uci\n");
 
 exit:
 	json_tokener_free(json_tok);

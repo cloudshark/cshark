@@ -37,6 +37,7 @@
 #define URL_MAX 8 + HOST_NAME_MAX + 7 + 1
 
 int config_load(void);
+int config_save_url(char *url);
 
 struct config {
 	char url[URL_MAX];
