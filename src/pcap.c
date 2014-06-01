@@ -58,7 +58,7 @@ void cshark_pcap_manage_packet(u_char *user, const struct pcap_pkthdr *header, c
 	if (stop_writing) return;
 
 	/* no need to check on every packet so check on every 10th that comes along */
-	if (cs->packets % 10) {
+	if (cs->packets % 10 == 0) {
 		if (statfs(filename, &result) < 0 ) {
 			ERROR("unable to determine free disk space for '%s'\n", filename);
 			stop_writing = true;
