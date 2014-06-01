@@ -210,7 +210,7 @@ int main(int argc, char *argv[])
 	uloop_run();
 
 	cshark_pcap_done(&cshark);
-	printf("\n%lu packets captured\n", (long unsigned int)cshark.packets);
+	printf("\n%lu packets captured\n", (long unsigned int) cshark.packets);
 
 	rc = cshark_uclient_init(&cshark);
 	if (rc) {
