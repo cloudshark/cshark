@@ -1,7 +1,7 @@
 # Cshark - CloudShark capture tool
 
-Capture traffic and upload it directly to the CloudShark service for analysis. Use the CloudShark
-service at https://openwrt.cloudshark.org or your own CloudShark appliance.
+Capture traffic and upload it directly to the [CloudShark](https://www.cloudshark.org "CloudShark") for analysis. 
+Use the CloudShark service at https://openwrt.cloudshark.org or your own CloudShark appliance.
 
 ## Building
 
