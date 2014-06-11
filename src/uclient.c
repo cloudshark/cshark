@@ -156,7 +156,8 @@ static void cshark_ustream_ssl_init(void)
 
 int cshark_uclient_init(struct cshark *cs)
 {
-	int capture_length, len;
+	long capture_length;
+	int  len;
 	char capture_length_str[32];
 	char buf[BUFSIZ];
 	char url[BUFSIZ];
@@ -212,7 +213,7 @@ int cshark_uclient_init(struct cshark *cs)
 	capture_length = ftell(fd);
 	fseek(fd, 0L, SEEK_SET);
 
-	snprintf(capture_length_str, 32, "%d", capture_length);
+	snprintf(capture_length_str, 32, "%ld", capture_length);
 	rc = uclient_http_set_header(cs->ucl, "Content-Length", capture_length_str);
 	if (rc) {
 		ERROR("uclient: could not set header\n");
