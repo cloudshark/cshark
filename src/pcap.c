@@ -53,6 +53,7 @@ void cshark_pcap_manage_packet(u_char *user, const struct pcap_pkthdr *header, c
 {
 	struct cshark *cs = (struct cshark *) user;
 	static int stop_writing = false;
+	static unsigned long captured_size = 0;
 	struct statfs result;
 
 	if (stop_writing) return;
@@ -67,13 +68,15 @@ void cshark_pcap_manage_packet(u_char *user, const struct pcap_pkthdr *header, c
 		}
 
 		/* leave a bit less then 512K of disk space available */
-		if ((result.f_bsize * result.f_bfree) < (512 * 1024)) {
+		if ((result.f_bsize * result.f_bfree) < captured_size) {
 			DEBUG("stopping capture due to low disk space\n");
 			stop_writing = true;
 			uloop_end();
 			return;
 		}
 	}
+
+	captured_size += header->len;
 
 	cs->packets++;
 	if (cs->limit_packets && (cs->limit_packets < cs->packets)) {
