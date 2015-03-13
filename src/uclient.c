@@ -32,7 +32,7 @@
 
 #include <libubox/uloop.h>
 
-#include <json/json.h>
+#include <json-c/json.h>
 
 #include "cshark.h"
 #include "config.h"
