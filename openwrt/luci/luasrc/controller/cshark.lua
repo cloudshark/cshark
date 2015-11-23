@@ -64,7 +64,7 @@ function cshark_iface_dump_stop()
 	local pid = f:read("*all")
 	io.close(f)
 
-	local res = os.execute("kill -INT " .. pid)
+	local res = os.execute("kill -TERM " .. pid)
 	luci.http.write(tostring(res))
 end
 
