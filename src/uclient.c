@@ -167,7 +167,7 @@ int cshark_uclient_init(struct cshark *cs)
 
 	if (strcmp(config.tags,"") != 0 ) {
 		/* include the additional tags parameter */
-		snprintf(extra_tags, BUFSIZ, "?additional_tags=%s", config.tags);
+		snprintf(extra_tags, BUFSIZ, "?additional_tags=%1007s", config.tags);
 
 	} else {
 		/* no additional tags specified */
