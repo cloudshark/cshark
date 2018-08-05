@@ -161,13 +161,13 @@ int cshark_uclient_init(struct cshark *cs)
 	char capture_length_str[32];
 	char buf[BUFSIZ];
 	char url[BUFSIZ];
-	char extra_tags[BUFSIZ];
+	char extra_tags[BUFSIZ+20];
 	FILE *fd = NULL;
 	int rc = -1;
 
 	if (strcmp(config.tags,"") != 0 ) {
 		/* include the additional tags parameter */
-		snprintf(extra_tags, BUFSIZ, "?additional_tags=%s", config.tags);
+		snprintf(extra_tags, BUFSIZ+20, "?additional_tags=%s", config.tags);
 
 	} else {
 		/* no additional tags specified */
