@@ -160,22 +160,22 @@ int cshark_uclient_init(struct cshark *cs)
 	int  len;
 	char capture_length_str[32];
 	char buf[BUFSIZ];
-	char url[BUFSIZ];
-	char extra_tags[BUFSIZ];
+	char url[BUFSIZ+35];
+	char extra_tags[BUFSIZ+19];
 	FILE *fd = NULL;
 	int rc = -1;
 
 	if (strcmp(config.tags,"") != 0 ) {
 		/* include the additional tags parameter */
-		snprintf(extra_tags, BUFSIZ, "?additional_tags=%s", config.tags);
+		snprintf(extra_tags, BUFSIZ+18, "?additional_tags=%s", config.tags);
 
 	} else {
 		/* no additional tags specified */
 		extra_tags[0] = 0;
 	}
 
-	len = snprintf(url, BUFSIZ, "%s/api/v1/%s/upload%s", config.url, config.token, extra_tags);
-	if (len < 0 || len >= BUFSIZ) {
+	len = snprintf(url, BUFSIZ+34, "%s/api/v1/%s/upload%s", config.url, config.token, extra_tags);
+	if (len < 0 || len >= BUFSIZ+35) {
 		ERROR("url is invalid or too big\n");
 		goto exit;
 	}
